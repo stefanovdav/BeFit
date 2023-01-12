@@ -4,15 +4,13 @@ public class Comment {
 	public final Integer id;
 	public final Integer user_id;
 	public final String content;
-	public final Integer depth;
-	public final Integer parentId;
+	public final String commentPath;
 
-	public Comment(Integer id, Integer user_id, String content, Integer depth, Integer parentId) {
+	public Comment(Integer id, Integer user_id, String content, String commentPath) {
 		this.id = id;
 		this.user_id = user_id;
 		this.content = content;
-		this.depth = depth;
-		this.parentId = parentId;
+		this.commentPath = commentPath;
 	}
 
 	@Override
@@ -21,8 +19,7 @@ public class Comment {
 				"id=" + id +
 				", user_id=" + user_id +
 				", content='" + content + '\'' +
-				", depth=" + depth +
-				", parentId=" + parentId +
+				", commentPath='" + commentPath + '\'' +
 				'}';
 	}
 }

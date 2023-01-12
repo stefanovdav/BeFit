@@ -19,8 +19,7 @@ public class MariaDbCommentRepository implements CommentRepository {
 	private final JdbcTemplate jdbc;
 	private final TransactionTemplate txTemplate;
 
-	public MariaDbCommentRepository(
-			JdbcTemplate jdbc, TransactionTemplate txTemplate) {
+	public MariaDbCommentRepository(JdbcTemplate jdbc, TransactionTemplate txTemplate) {
 		this.jdbc = jdbc;
 		this.txTemplate = txTemplate;
 	}
@@ -29,10 +28,7 @@ public class MariaDbCommentRepository implements CommentRepository {
 	public CommentEntity createFirstComment(String content, int userId, int post_id) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbc.update(conn -> {
-			PreparedStatement ps = conn.prepareStatement(
-					"INSERT INTO comments (user_id, content, post_id) " +
-							"VALUES (?, ?, ?);",
-					Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO comments (user_id, content, post_id) " + "VALUES (?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, userId);
 			ps.setString(2, content);
 			ps.setInt(3, post_id);
@@ -40,9 +36,10 @@ public class MariaDbCommentRepository implements CommentRepository {
 		}, keyHolder);
 
 		Integer id = Objects.requireNonNull(keyHolder.getKey()).intValue();
-		return new CommentEntity(id, post_id,  userId, content, 0, null);
+		return new CommentEntity(id, post_id, userId, content, Integer.toString(post_id));
 	}
 
+	//TODO:Optimize query
 	@Override
 	public CommentEntity createSubComment(String content, int parentId, int userId) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -50,19 +47,25 @@ public class MariaDbCommentRepository implements CommentRepository {
 		int post_id = getComment(parentId).post_id;
 		jdbc.update(conn -> {
 			PreparedStatement ps = conn.prepareStatement(
-					"INSERT INTO comments (user_id, content, parent_comment_id, post_id, depth) " +
-							"VALUES (?, ?, ?, ?, ?);",
+					"INSERT INTO comments (user_id," +
+							" content, " +
+							"post_id) " +
+							"VALUES (?, ?, ?);",
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, userId);
 			ps.setString(2, content);
-			ps.setInt(3, parentId);
-			ps.setInt(4, comment.post_id);
-			ps.setInt(5, comment.depth + 1);
+			ps.setInt(3, comment.post_id);
 			return ps;
 		}, keyHolder);
 
 		Integer id = Objects.requireNonNull(keyHolder.getKey()).intValue();
-		return new CommentEntity(id, post_id, userId, content, 0, null);
+		String path = comment.commentPath + "/" + id;
+
+		jdbc.update(
+				"UPDATE comments SET comment_path = ? WHERE id = ? ",
+				path, id);
+
+		return new CommentEntity(id, post_id, userId, content, path);
 
 	}
 
@@ -72,8 +75,7 @@ public class MariaDbCommentRepository implements CommentRepository {
 						"post_id, " +
 						"user_id, " +
 						"content, " +
-						"depth, " +
-						"parent_comment_id " +
+						"comment_path" +
 						"FROM comments " +
 						"WHERE id = ?",
 				(rs, rowNum) -> fromResultSet(rs), commentId);
@@ -81,7 +83,9 @@ public class MariaDbCommentRepository implements CommentRepository {
 
 	@Override
 	public Optional<CommentEntity> getParent(int commentId) {
-		return Optional.ofNullable(getComment(getComment(commentId).parentId));
+		String path = getComment(commentId).commentPath;
+		int id = path.charAt(path.length() - 1);
+		return Optional.ofNullable(getComment(id));
 	}
 
 	@Override
@@ -90,18 +94,17 @@ public class MariaDbCommentRepository implements CommentRepository {
 						"post_id " +
 						"user_id, " +
 						"content, " +
-						"depth, " +
-						"parent_comment_id " +
+						"comment_path" +
 						"FROM comments " +
-						"WHERE parent_comment_id = ?",
-				(rs, rowNum) -> fromResultSet(rs), commentId));
+						"WHERE comment_path LIKE ?",
+				(rs, rowNum) -> fromResultSet(rs), getComment(commentId).commentPath + "/%"));
 	}
 
 	@Override
 	public void editContent(int commentId, String newContent) {
 		jdbc.update(
 				"UPDATE comments SET content = ? WHERE id = ? ",
-				 newContent, commentId);
+				newContent, commentId);
 	}
 
 	private CommentEntity fromResultSet(ResultSet rs) throws SQLException {
@@ -110,8 +113,6 @@ public class MariaDbCommentRepository implements CommentRepository {
 				rs.getInt("post_id"),
 				rs.getInt("user_id"),
 				rs.getString("content"),
-				rs.getInt("depth"),
-				rs.getInt("parent_comment_id")
-		);
+				rs.getString("comment_path"));
 	}
 }

@@ -7,7 +7,7 @@ import org.beFit.v1.repositories.entities.UserEntity;
 import java.util.List;
 
 public interface PostRepository {
-	PostEntity createPost(int userId, String imageUrl, String content);
+	PostEntity createPost(int userId, Integer imageId, String content);
 
 	PostEntity getById(int postId);
 

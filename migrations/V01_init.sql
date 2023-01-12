@@ -2,32 +2,51 @@ CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) NOT NULL,
     password_hash VARCHAR(60) NOT NULL,
-    avatarURL VARCHAR(255),
-    balance DECIMAL(10,2) DEFAULT 0.00
+    image_id INT,
+    balance DECIMAL(10,2) DEFAULT 0.00,
+    FOREIGN KEY (image_id) REFERENCES images(id)
 );
 
 CREATE TABLE IF NOT EXISTS posts (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    imageURL VARCHAR(255),
+    image_id INT,
     content VARCHAR(255),
-    votes INT NOT NULL,
-    postTime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    isArchived BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    votes INT NOT NULL DEFAULT 0,
+    post_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    is_archived BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (image_id) REFERENCES images(id)
+);
+
+CREATE TABLE IF NOT EXISTS images (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255),
+    url VARCHAR(255),
+    public_id VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS fitGroups (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    stake DECIMAL(10,2)
+    group_name VARCHAR(50) NOT NULL,
+    stake DECIMAL(10,2),
+    balance DECIMAL(10,2) DEFAULT 0.00
+);
+
+CREATE TABLE IF NOT EXISTS group_post (
+    group_id INT NOT NULL,
+    post_id INT NOT NULL,
+    FOREIGN KEY (post_id) REFERENCES posts(id),
+    FOREIGN KEY (group_id) REFERENCES fitGroups(id),
+    PRIMARY KEY (post_id, group_id)
 );
 
 CREATE TABLE IF NOT EXISTS user_groups (
     user_id INT NOT NULL,
     group_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (group_id) REFERENCES fitGroups(id)
+    FOREIGN KEY (group_id) REFERENCES fitGroups(id),
+    PRIMARY KEY (user_id, group_id)
 );
 
 CREATE TABLE IF NOT EXISTS comments (
@@ -35,16 +54,9 @@ CREATE TABLE IF NOT EXISTS comments (
    post_id INT NOT NULL,
    user_id INT NOT NULL,
    content TEXT NOT NULL,
-   PRIMARY KEY (id)
-);
-
-CREATE TABLE IF NOT EXISTS sub_comments (
-   id INT NOT NULL AUTO_INCREMENT,
-   comment_id INT NOT NULL,
-   user_id INT NOT NULL,
-   content TEXT NOT NULL,
+   comment_path VARCHAR(20) NOT NULL,
    PRIMARY KEY (id),
-   FOREIGN KEY (comment_id) REFERENCES comments(id)
+   FOREIGN KEY (parent_comment_id) REFERENCES comments(id)
 );
 
 CREATE TABLE IF NOT EXISTS auth_tokens (
@@ -60,15 +72,9 @@ CREATE TABLE IF NOT EXISTS roles (
 );
 
 CREATE TABLE IF NOT EXISTS users_to_roles (
-    user_id INT,
-    role_id INT,
+    user_id INT NOT NULL,
+    role_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (role_id) REFERENCES roles(id),
     PRIMARY KEY (user_id, role_id)
 );
-
-INSERT INTO roles(id, name) VALUES (1, 'USER');
-INSERT INTO roles(id, name) VALUES (2, 'ADMIN');
-
-INSERT INTO credentials(id, username, password_hash) VALUES (1, 'admin', '$2a$10$aXkejBeA6PgfnucD4Sq5aeK6b/jAW0bcQVJXzqYqriGCCDfB4.7By');
-INSERT INTO credentials_to_roles (credentials_id, role_id) VALUES (1, 2)

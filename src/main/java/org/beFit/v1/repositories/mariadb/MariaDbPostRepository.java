@@ -1,9 +1,7 @@
 package org.beFit.v1.repositories.mariadb;
 
 import org.beFit.v1.repositories.PostRepository;
-import org.beFit.v1.repositories.entities.CommentEntity;
 import org.beFit.v1.repositories.entities.PostEntity;
-import org.beFit.v1.repositories.entities.UserEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -14,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,20 +27,20 @@ public class MariaDbPostRepository implements PostRepository {
 	}
 
 	@Override
-	public PostEntity createPost(int userId, String imageUrl, String content) {
+	public PostEntity createPost(int userId, Integer imageId, String content) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbc.update(conn -> {
 			PreparedStatement ps = conn.prepareStatement(
-					"INSERT INTO posts (user_id, imageURL, content) VALUES (?, ?, ?)",
+					"INSERT INTO posts (user_id, image_id, content) VALUES (?, ?, ?)",
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, userId);
-			ps.setString(2, imageUrl);
+			ps.setInt(2, imageId);
 			ps.setString(3, content);
 			return ps;
 		}, keyHolder);
 
 		Integer id = Objects.requireNonNull(keyHolder.getKey()).intValue();
-		return new PostEntity(id, userId, imageUrl, content, 0, Instant.now(), false);
+		return new PostEntity(id, userId, imageId, content, 0, Instant.now(), false);
 	}
 
 	@Override
@@ -51,7 +48,7 @@ public class MariaDbPostRepository implements PostRepository {
 		return jdbc.queryForObject("SELECT " +
 						"id, " +
 						"user_id, " +
-						"imageURL, " +
+						"image_id, " +
 						"content, " +
 						"votes, " +
 						"post_time, " +
@@ -79,7 +76,7 @@ public class MariaDbPostRepository implements PostRepository {
 		return jdbc.query("SELECT " +
 						"id, " +
 						"user_id, " +
-						"imageURL, " +
+						"image_id, " +
 						"content, votes, " +
 						"post_time, " +
 						"is_archived " +
@@ -92,7 +89,7 @@ public class MariaDbPostRepository implements PostRepository {
 	public List<PostEntity> listFitGroupsPostsOfUser(int page, int pageSize, int userId) {
 		//TODO: fix the page_id so that it remembers
 		return jdbc.query("SELECT posts.id, posts.user_id, " +
-						"posts.imageURL, posts.content, " +
+						"posts.image_id, posts.content, " +
 						"posts.votes, posts.post_time, " +
 						"FROM posts p " +
 						"INNER JOIN user_groups ug ON ug.user_id = p.user_id " +
@@ -111,7 +108,7 @@ public class MariaDbPostRepository implements PostRepository {
 		return new PostEntity(
 				rs.getInt("id"),
 				rs.getInt("user_id"),
-				rs.getString("imageURL"),
+				rs.getInt("image_id"),
 				rs.getString("content"),
 				rs.getInt("votes"),
 				rs.getTimestamp("post_time").toInstant(),

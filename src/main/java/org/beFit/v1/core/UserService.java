@@ -23,8 +23,8 @@ public class UserService {
 		repository.changeBalance(id, money);
 	}
 
-	public void changeAvatar(Integer id, String newUrl) {
-		repository.changeAvatar(id, newUrl);
+	public void changeAvatar(Integer id, int image_id) {
+		repository.changeAvatar(id, image_id);
 	}
 
 	public void changePassword(Integer id, String newPassword) {

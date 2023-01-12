@@ -44,7 +44,7 @@ public class MariaDbUserRepository implements UserRepository {
 						"INSERT INTO users_to_roles (user_id, role_id) " +
 								"VALUES (?, ?)", id, r.id);
 			}
-			return new UserEntity(id, username, password, roles, "", BigDecimal.ZERO);
+			return new UserEntity(id, username, password, roles, null, BigDecimal.ZERO);
 		});
 	}
 
@@ -52,7 +52,7 @@ public class MariaDbUserRepository implements UserRepository {
 	public UserEntity getUser(int userId) {
 		return txTemplate.execute(status -> {
 			Map<String, Object> user = jdbc.queryForMap(
-					"SELECT id, username, password_hash, avatar_URL, balance " +
+					"SELECT id, username, password_hash, image_id, balance " +
 							"FROM users WHERE id = ?", userId);
 			// TODO: Throw exception when creds not found, but dunno what exception
 			// is returned. Need to test this.
@@ -76,7 +76,7 @@ public class MariaDbUserRepository implements UserRepository {
 							(String) user.get("username"),
 							(String) user.get("password_hash"),
 							roles,
-							(String) user.get("avatar_URL"),
+							(int) user.get("image_id"),
 							(BigDecimal) user.get("balance")));
 		});
 	}
@@ -105,10 +105,10 @@ public class MariaDbUserRepository implements UserRepository {
 	}
 
 	@Override
-	public void changeAvatar(int userId, String newUrl) {
+	public void changeAvatar(int userId, int image_id) {
 		jdbc.update(
-				"UPDATE users SET avatar_URL = ? WHERE id = ? " +
-						"VALUES (?, ?)", newUrl, userId);
+				"UPDATE users SET image-id = ? WHERE id = ? " +
+						"VALUES (?, ?)", image_id, userId);
 	}
 
 	@Override
@@ -122,9 +122,9 @@ public class MariaDbUserRepository implements UserRepository {
 	@Override
 	public List<String> getUserMemories(int userId) {
 		List<String> memories = jdbc.query(
-				"SELECT image_URL FROM posts WHERE user_id = ?",
+				"SELECT image_id FROM posts WHERE user_id = ?",
 				(rs, rowNum) -> {
-					return rs.getString("image_URL");
+					return rs.getString("image_id");
 				}, userId);
 		return memories;
 	}
@@ -146,7 +146,7 @@ public class MariaDbUserRepository implements UserRepository {
 	public Optional<UserEntity> getUser(String username) {
 		return txTemplate.execute(status -> {
 			Map<String, Object> user = jdbc.queryForMap(
-					"SELECT id, username, password_hash, avatar_URL, balance " +
+					"SELECT id, username, password_hash, image_id, balance " +
 							"FROM users WHERE username = ?", username);
 			// TODO: Throw exception when creds not found, but dunno what exception
 			// is returned. Need to test this.
@@ -170,7 +170,7 @@ public class MariaDbUserRepository implements UserRepository {
 							(String) user.get("username"),
 							(String) user.get("password_hash"),
 							roles,
-							(String) user.get("avatar_URL"),
+							(int) user.get("image_id"),
 							(BigDecimal) user.get("balance")));
 		});
 	}
@@ -179,7 +179,7 @@ public class MariaDbUserRepository implements UserRepository {
 	public Optional<UserEntity> getUserByAuthToken(String authToken) {
 		return txTemplate.execute(status -> {
 			Map<String, Object> user = jdbc.queryForMap(
-					"SELECT u.id as id, u.username as username, u.password_hash as password_hash, u.avatar_URL as avatar_URL, u.balance as balance " +
+					"SELECT u.id as id, u.username as username, u.password_hash as password_hash, u.image_id as image_id, u.balance as balance " +
 							"FROM users u " +
 							"JOIN auth_tokens at ON u.id = at.user_id " +
 							"WHERE at.token = ?", authToken);
@@ -205,7 +205,7 @@ public class MariaDbUserRepository implements UserRepository {
 							(String) user.get("username"),
 							(String) user.get("password_hash"),
 							roles,
-							(String) user.get("avatar_URL"),
+							(int) user.get("image_id"),
 							(BigDecimal) user.get("balance")));
 		});
 	}
@@ -217,10 +217,6 @@ public class MariaDbUserRepository implements UserRepository {
 				"INSERT INTO users_to_roles (user_id, role_id) VALUES (?, ?)";
 		public static final String GET_BALANCE_BY_ID =
 				"SELECT balance FROM users WHERE id=?";
-		public static final String UPDATE_Balance_BY_ID =
-				"UPDATE users\n" +
-						"SET balance = ?\n" +
-						"WHERE id = ?;";
 	}
 }
 

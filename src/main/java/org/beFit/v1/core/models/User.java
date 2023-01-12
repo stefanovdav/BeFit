@@ -10,19 +10,19 @@ public class User {
 	public final Integer id;
 	public final String username;
 	public final List<Role> roles;
-	public final String avatarUrl;
+	public final Integer imageId;
 	public final BigDecimal balance;
 
-	@JsonCreator
-	public User(@JsonProperty("id") Integer id,
-				@JsonProperty("username") String username,
+
+	public User(Integer id,
+				String username,
 				List<Role> roles,
-				@JsonProperty("avatarUrl") String avatarUrl,
-				@JsonProperty("balance") BigDecimal balance) {
+				Integer imageId,
+				BigDecimal balance) {
 		this.id = id;
 		this.username = username;
 		this.roles = roles;
-		this.avatarUrl = avatarUrl;
+		this.imageId = imageId;
 		this.balance = balance;
 	}
 
@@ -32,7 +32,7 @@ public class User {
 				"id=" + id +
 				", username='" + username + '\'' +
 				", roles=" + roles +
-				", avatarUrl='" + avatarUrl + '\'' +
+				", imageId=" + imageId +
 				", balance=" + balance +
 				'}';
 	}

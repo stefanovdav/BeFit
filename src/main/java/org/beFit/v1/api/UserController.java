@@ -43,8 +43,8 @@ public class UserController {
 	}
 
 	@PatchMapping(value = "/{id}/avatar")
-	public void changeAvatar(@PathVariable("id") Integer id, @RequestParam("avatar") String newUrl) {
-		userService.changeAvatar(id, newUrl);
+	public void changeAvatar(@PathVariable("id") Integer id, @RequestParam("image_id") int image_id) {
+		userService.changeAvatar(id, image_id);
 	}
 
 	//TODO:How to change password and delete comments

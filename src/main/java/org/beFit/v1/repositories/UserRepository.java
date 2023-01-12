@@ -14,7 +14,7 @@ public interface UserRepository {
 
 	void changeBalance(int userId, BigDecimal money);
 
-	void changeAvatar(int userId, String newUrl);
+	void changeAvatar(int userId, int image_id);
 
 	void changePassword(int userId, String newPassword);
 
