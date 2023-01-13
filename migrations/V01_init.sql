@@ -1,8 +1,17 @@
+CREATE TABLE IF NOT EXISTS images (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255),
+    url VARCHAR(255),
+    public_id VARCHAR(255) DEFAULT "no id"
+);
+
+INSERT INTO images (title, url) VALUES ("default-avatar_ngrsnt", "https://res.cloudinary.com/dyhaxytra/image/upload/v1673618324/beFit/default-avatar_ngrsnt.png");
+
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(255) NOT NULL,
     password_hash VARCHAR(60) NOT NULL,
-    image_id INT,
+    image_id INT DEFAULT 1,
     balance DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (image_id) REFERENCES images(id)
 );
@@ -17,13 +26,6 @@ CREATE TABLE IF NOT EXISTS posts (
     is_archived BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (image_id) REFERENCES images(id)
-);
-
-CREATE TABLE IF NOT EXISTS images (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(255),
-    url VARCHAR(255),
-    public_id VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS fitGroups (
@@ -54,9 +56,8 @@ CREATE TABLE IF NOT EXISTS comments (
    post_id INT NOT NULL,
    user_id INT NOT NULL,
    content TEXT NOT NULL,
-   comment_path VARCHAR(20) NOT NULL,
-   PRIMARY KEY (id),
-   FOREIGN KEY (parent_comment_id) REFERENCES comments(id)
+   comment_path VARCHAR(20),
+   PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS auth_tokens (
@@ -70,6 +71,9 @@ CREATE TABLE IF NOT EXISTS roles (
     id INT PRIMARY KEY,
     name VARCHAR(255) UNIQUE
 );
+
+INSERT INTO roles (id, name) VALUES (1, "USER");
+INSERT INTO roles (id, name) VALUES (2, "ADMIN");
 
 CREATE TABLE IF NOT EXISTS users_to_roles (
     user_id INT NOT NULL,

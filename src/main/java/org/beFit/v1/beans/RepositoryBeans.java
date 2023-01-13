@@ -1,13 +1,7 @@
 package org.beFit.v1.beans;
 
-import org.beFit.v1.repositories.CommentRepository;
-import org.beFit.v1.repositories.FitGroupRepository;
-import org.beFit.v1.repositories.PostRepository;
-import org.beFit.v1.repositories.UserRepository;
-import org.beFit.v1.repositories.mariadb.MariaDbCommentRepository;
-import org.beFit.v1.repositories.mariadb.MariaDbFitGroupRepository;
-import org.beFit.v1.repositories.mariadb.MariaDbPostRepository;
-import org.beFit.v1.repositories.mariadb.MariaDbUserRepository;
+import org.beFit.v1.repositories.*;
+import org.beFit.v1.repositories.mariadb.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,5 +32,10 @@ public class RepositoryBeans {
 	public FitGroupRepository fitGroupRepository (
 			TransactionTemplate txTemplate, JdbcTemplate jdbcTemplate) {
 		return new MariaDbFitGroupRepository(txTemplate, jdbcTemplate);
+	}
+
+	@Bean
+	public ImageRepository imageRepository (TransactionTemplate txTemplate, JdbcTemplate jdbcTemplate) {
+		return new MariaDbImageRepository(jdbcTemplate, txTemplate);
 	}
 }

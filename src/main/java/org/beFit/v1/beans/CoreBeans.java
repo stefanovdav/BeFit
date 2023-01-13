@@ -1,10 +1,9 @@
 package org.beFit.v1.beans;
 
+import com.cloudinary.Cloudinary;
 import org.beFit.v1.core.*;
-import org.beFit.v1.repositories.CommentRepository;
-import org.beFit.v1.repositories.FitGroupRepository;
-import org.beFit.v1.repositories.PostRepository;
-import org.beFit.v1.repositories.UserRepository;
+import org.beFit.v1.core.imageservice.CloudinaryService;
+import org.beFit.v1.repositories.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,5 +37,10 @@ public class CoreBeans {
 	@Bean
 	public AuthService authService(UserRepository userRepository) {
 		return new AuthService(userRepository);
+	}
+
+	@Bean
+	CloudinaryService cloudinaryService(ImageRepository imageRepository, Cloudinary c) {
+		return new CloudinaryService(c, imageRepository);
 	}
 }

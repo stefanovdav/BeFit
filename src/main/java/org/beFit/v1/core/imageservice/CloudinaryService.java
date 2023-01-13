@@ -65,6 +65,11 @@ public class CloudinaryService implements ImageService {
 	}
 
 	@Override
+	public Image getImage(Integer id) {
+		return Mappers.fromImageEntity(imageRepository.get(id));
+	}
+
+	@Override
 	public boolean delete(Integer id) {
 		ImageEntity imageEntity = imageRepository.get(id);
 		if (imageEntity != null) {
