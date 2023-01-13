@@ -3,6 +3,7 @@ package org.beFit.v1.core;
 import org.beFit.v1.core.models.Post;
 import org.beFit.v1.repositories.PostRepository;
 import org.beFit.v1.repositories.UserRepository;
+import org.springframework.data.relational.core.sql.In;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,10 +19,10 @@ public class PostService {
 		this.authService = authService;
 	}
 
-	public Post createPost(String authToken, String imageUrl, String content) {
+	public Post createPost(String authToken, Integer imageId, String content) {
 		int userId = authService.getUserByAuthToken(authToken).get().id;
 		return Mappers.fromPostEntity(
-				postRepository.createPost(userId, imageUrl, content)
+				postRepository.createPost(userId, imageId, content)
 		);
 	}
 

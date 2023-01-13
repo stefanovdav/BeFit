@@ -1,4 +1,4 @@
-package org.beFit.v1.api.models;
+package org.beFit.v1.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 

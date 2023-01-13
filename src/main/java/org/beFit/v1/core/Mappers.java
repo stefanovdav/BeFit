@@ -3,7 +3,7 @@ package org.beFit.v1.core;
 import org.beFit.v1.core.models.*;
 import org.beFit.v1.repositories.entities.*;
 
-class Mappers {
+public class Mappers {
 	public static User fromUserEntity(UserEntity c) {
 		return new User(c.id, c.username, c.roles, c.imageId, c.balance);
 	}

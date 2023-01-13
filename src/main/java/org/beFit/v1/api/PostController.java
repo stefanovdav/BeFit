@@ -41,7 +41,7 @@ public class PostController {
 
 	@PostMapping
 	public Post createPost(@RequestHeader("Authorization") String authToken, @RequestBody PostInput p) {
-		return postService.createPost(authToken, p.imageUrl, p.content);
+		return postService.createPost(authToken, p.imageId, p.content);
 	}
 
 	//TODO:Make a hard delete
