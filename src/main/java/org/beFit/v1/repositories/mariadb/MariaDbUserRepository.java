@@ -44,7 +44,7 @@ public class MariaDbUserRepository implements UserRepository {
 						"INSERT INTO users_to_roles (user_id, role_id) " +
 								"VALUES (?, ?)", id, r.id);
 			}
-			return new UserEntity(id, username, password, roles, null, BigDecimal.ZERO);
+			return new UserEntity(id, username, password, roles, 1, BigDecimal.ZERO);
 		});
 	}
 
@@ -148,8 +148,6 @@ public class MariaDbUserRepository implements UserRepository {
 			Map<String, Object> user = jdbc.queryForMap(
 					"SELECT id, username, password_hash, image_id, balance " +
 							"FROM users WHERE username = ?", username);
-			// TODO: Throw exception when creds not found, but dunno what exception
-			// is returned. Need to test this.
 
 			List<Integer> roleIDs = jdbc.query(
 					"SELECT role_id FROM users_to_roles WHERE user_id = ?",
@@ -183,8 +181,6 @@ public class MariaDbUserRepository implements UserRepository {
 							"FROM users u " +
 							"JOIN auth_tokens at ON u.id = at.user_id " +
 							"WHERE at.token = ?", authToken);
-			// TODO: Throw exception when creds not found, but dunno what exception
-			// is returned. Need to test this.
 
 			List<Integer> roleIDs = jdbc.query(
 					"SELECT role_id FROM users_to_roles WHERE user_id = ?",

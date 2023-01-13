@@ -9,12 +9,14 @@ INSERT INTO images (title, url) VALUES ("default-avatar_ngrsnt", "https://res.cl
 
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(60) NOT NULL,
     image_id INT DEFAULT 1,
     balance DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (image_id) REFERENCES images(id)
 );
+
+Select * from users;
 
 CREATE TABLE IF NOT EXISTS posts (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -27,7 +29,7 @@ CREATE TABLE IF NOT EXISTS posts (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (image_id) REFERENCES images(id)
 );
-
+--table vzeti pari i sledi kolko pari, vzel, dedline na grupa (cron job ), assign skipped fee na group
 CREATE TABLE IF NOT EXISTS fitGroups (
     id INT PRIMARY KEY AUTO_INCREMENT,
     group_name VARCHAR(50) NOT NULL,
@@ -50,7 +52,7 @@ CREATE TABLE IF NOT EXISTS user_groups (
     FOREIGN KEY (group_id) REFERENCES fitGroups(id),
     PRIMARY KEY (user_id, group_id)
 );
-
+--foreign keys
 CREATE TABLE IF NOT EXISTS comments (
    id INT NOT NULL AUTO_INCREMENT,
    post_id INT NOT NULL,

@@ -30,7 +30,7 @@ public class AuthService {
 
 
         return userRepository.createAuthToken(
-                user.get().id, generateAuthToken());
+                user.get().id, generateAuthTokenWithoutBearer());
     }
 
     public void register(String username, String password) {
@@ -41,9 +41,6 @@ public class AuthService {
 
     public Optional<User> getUserByAuthToken(String authToken) {
         String token = authToken;
-        if(token.split(" ").length == 2) {
-            token = removeBearer(token);
-        }
         Optional<UserEntity> user =
                 userRepository.getUserByAuthToken(token);
         return user.map(Mappers::fromUserEntity);
