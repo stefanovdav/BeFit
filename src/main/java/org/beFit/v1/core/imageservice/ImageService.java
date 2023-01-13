@@ -5,6 +5,6 @@ import org.beFit.v1.core.models.Image;
 
 public interface ImageService {
 	Image upload(ImageUploadPayloadDTO imageUploadDTO, String folderName);
-	boolean delete(Image imageEntity);
+	boolean delete(Integer id);
 }
 
