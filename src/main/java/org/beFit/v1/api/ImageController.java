@@ -1,5 +1,6 @@
 package org.beFit.v1.api;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.beFit.v1.core.imageservice.CloudinaryService;
 import org.beFit.v1.core.models.Image;
 import org.beFit.v1.dto.ImageUploadPayloadDTO;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/images")
+@SecurityRequirement(name = "bearerAuth")
 public class ImageController {
 
 	CloudinaryService cloudinaryService;

@@ -20,7 +20,9 @@ public interface UserRepository {
 
 	List<String> getUserMemories(int userId);
 
-	void addUserToGroup(int userId, int groupId);
+	void addUserToGroup(int userId, int groupId, BigDecimal frozenAssets);
+
+	void removeUserFrom(int userId, int groupId, BigDecimal frozenAssets);
 
 	String createAuthToken(Integer userId, String authToken);
 
@@ -29,4 +31,6 @@ public interface UserRepository {
 	Optional<UserEntity> getUserByAuthToken(String authToken);
 
 	void deleteUser(int id);
+
+	BigDecimal showUserFrozenAssetsInGroup(int id, Integer groupId);
 }

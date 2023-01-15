@@ -1,8 +1,6 @@
 package org.beFit.v1.repositories;
 
-import org.beFit.v1.repositories.entities.CommentEntity;
 import org.beFit.v1.repositories.entities.PostEntity;
-import org.beFit.v1.repositories.entities.UserEntity;
 
 import java.util.List;
 
@@ -15,7 +13,7 @@ public interface PostRepository {
 
 	void changeVotes(int postId, int vote);
 
-	List<PostEntity> getPostsByUser(int userId);
+	List<PostEntity> getPostsByUser(int page, int pageSize, int userId);
 
 	List<PostEntity> listFitGroupsPostsOfUser(int page, int pageSize, int userId);
 }

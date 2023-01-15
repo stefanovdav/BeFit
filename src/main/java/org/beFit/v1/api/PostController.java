@@ -1,5 +1,6 @@
 package org.beFit.v1.api;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.beFit.v1.api.models.PostInput;
 import org.beFit.v1.core.AuthService;
 import org.beFit.v1.core.PostService;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/posts")
+@SecurityRequirement(name = "bearerAuth")
 public class PostController {
 	private PostService postService;
 
@@ -50,12 +52,21 @@ public class PostController {
 //	public void deletePost(
 //			@RequestHeader("Authorization") String authToken,
 //			@PathVariable("id") Integer id) {
-//		postService.archivePost(id);
+//		postService.delete(id);
 //	}
 
 	//TODO:Add pagination and only the photo
-	@GetMapping
-	public List<Post> getUserPastPosts(@RequestHeader("Authorization") String authToken) {
-		return postService.getPostsByUser(authToken);
+	@GetMapping(value = "/memories/{page}/{pageSize}")
+	public List<Post> getUserPastPosts(@RequestHeader("Authorization") String authToken,
+									   @PathVariable("page") int page,
+									   @PathVariable("pageSize") int pageSize) {
+		return postService.getPostsByUser(page, pageSize, authToken);
+	}
+
+	@GetMapping(value = "/feed/{page}/{pageSize}")
+	public List<Post> listFitGroupsPostsOfUser(@PathVariable("page") int page,
+											   @PathVariable("pageSize") int pageSize,
+											   @RequestHeader("Authorization") String authToken) {
+		return postService.listFitGroupsPostsOfUser(page, pageSize, authToken);
 	}
 }

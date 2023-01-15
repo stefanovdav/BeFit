@@ -1,5 +1,6 @@
 package org.beFit.v1.api;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.beFit.v1.api.models.CommentEditInput;
 import org.beFit.v1.api.models.CommentInput;
 import org.beFit.v1.api.models.PostInput;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/comments")
+@SecurityRequirement(name = "bearerAuth")
 public class CommentController {
 	private CommentService commentService;
 	private AuthService authService;

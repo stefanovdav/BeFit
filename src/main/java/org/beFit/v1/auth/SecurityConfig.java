@@ -27,7 +27,13 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final RequestMatcher PUBLIC_URLS =
-            new AntPathRequestMatcher("/api/auth/**");
+            new OrRequestMatcher(
+                    new AntPathRequestMatcher("/api/auth/**"),
+                    new AntPathRequestMatcher("/v3/api-docs"),
+                    new AntPathRequestMatcher("/v3/api-docs/**"),
+                    new AntPathRequestMatcher("/swagger-ui/**"),
+                    new AntPathRequestMatcher("/swagger-ui")
+            );
     private static final RequestMatcher ADMIN_URLS =
             new AntPathRequestMatcher("/api/admin/**");
     private static final RequestMatcher USER_URLS =

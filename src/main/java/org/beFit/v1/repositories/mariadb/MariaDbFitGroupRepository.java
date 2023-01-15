@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class MariaDbFitGroupRepository implements FitGroupRepository {
@@ -24,20 +26,26 @@ public class MariaDbFitGroupRepository implements FitGroupRepository {
 	}
 
 	@Override
-	public FitGroupEntity createFitGroup(String name, BigDecimal stake) {
+	public FitGroupEntity createFitGroup(String name, BigDecimal stake, Integer tax, Date end, String key) {
+		Date now = Date.valueOf(LocalDate.now());
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		jdbc.update(conn -> {
 			PreparedStatement ps = conn.prepareStatement(
-					"INSERT INTO fitGroups (group_name, stake)" +
-							"VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+					"INSERT INTO fitGroups (group_name, stake, tax, end, group_key, start)" +
+							"VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, name);
 			ps.setBigDecimal(2, stake);
+			ps.setInt(3, tax);
+			ps.setDate(4, end);
+			ps.setString(5, key);
+			ps.setDate(6, now);
 			return ps;
 		}, keyHolder);
 
 		Integer id = Objects.requireNonNull(keyHolder.getKey()).intValue();
-		return new FitGroupEntity(id, name, stake, BigDecimal.ZERO);
+
+		return new FitGroupEntity(id, name, stake, tax, now, end, 0);
 	}
 
 	@Override
@@ -45,7 +53,10 @@ public class MariaDbFitGroupRepository implements FitGroupRepository {
 		return jdbc.queryForObject("SELECT id, " +
 						"group_name, " +
 						"stake, " +
-						"balance " +
+						"participants, " +
+						"tax, " +
+						"start, " +
+						"end " +
 						"FROM fitGroups " +
 						"WHERE id = ?",
 				(rs, rowNum) -> fromResultSet(rs), id);
@@ -67,7 +78,9 @@ public class MariaDbFitGroupRepository implements FitGroupRepository {
 				rs.getInt("id"),
 				rs.getString("name"),
 				rs.getBigDecimal("stake"),
-				rs.getBigDecimal("balance")
-		);
+				rs.getInt("tax"),
+				rs.getDate("start"),
+				rs.getDate("end"),
+				rs.getInt("participants"));
 	}
 }

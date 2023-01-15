@@ -1,5 +1,6 @@
 package org.beFit.v1.api;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.beFit.v1.core.CommentService;
 import org.beFit.v1.core.PostService;
 import org.beFit.v1.core.UserService;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/user")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
 	private UserService userService;
@@ -61,5 +63,10 @@ public class UserController {
 		userService.deleteUser(id);
 	}
 
+	@GetMapping(value = "/{id}/{groupId}/assets}")
+	public BigDecimal showUserFrozenAssetsInGroup(@PathVariable("id") Integer id,
+												  @PathVariable("groupId") Integer groupId) {
+		return userService.showUserFrozenAssetsInGroup(id, groupId);
+	}
 
 }

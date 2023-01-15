@@ -9,9 +9,11 @@ import java.util.List;
 
 public class UserService {
 	private final UserRepository repository;
+	private final FitGroupService fitGroupService;
 
-	public UserService(UserRepository repository) {
+	public UserService(UserRepository repository, FitGroupService fitGroupService) {
 		this.repository = repository;
+		this.fitGroupService = fitGroupService;
 	}
 
 	public User getUser(int userId) {
@@ -36,10 +38,24 @@ public class UserService {
 	}
 
 	public void addUserToGroup(Integer id, int groupId) {
-		repository.addUserToGroup(id, groupId);
+		//TODO: signal when there arent enough assets to enter
+		BigDecimal stake = fitGroupService.getFitGroup(groupId).stake;
+		if (stake.equals(BigDecimal.ZERO)) {
+			repository.addUserToGroup(id, groupId, stake);
+		} else {
+			BigDecimal balance = getUser(id).balance;
+			if (balance.compareTo(stake) >= 0) {
+				changeBalance(id, stake.negate());
+				repository.addUserToGroup(id, groupId, stake);
+			}
+		}
 	}
 
 	public void deleteUser(Integer id) {
 		repository.deleteUser(id);
+	}
+
+	public BigDecimal showUserFrozenAssetsInGroup(int id, Integer groupId) {
+		return repository.showUserFrozenAssetsInGroup(id, groupId);
 	}
 }

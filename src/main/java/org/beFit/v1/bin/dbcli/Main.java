@@ -13,7 +13,7 @@ import java.sql.SQLException;
 public class Main {
     public static void main(String[] args) throws SQLException {
         Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/befit","root","1234");
+                "jdbc:mysql://localhost:3360/beFit","root","1234");
 
         DataSource dataSource = new SingleConnectionDataSource(conn, false);
         JdbcTemplate jdbcTemplate =

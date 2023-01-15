@@ -72,7 +72,7 @@ public class MariaDbPostRepository implements PostRepository {
 	}
 
 	@Override
-	public List<PostEntity> getPostsByUser(int userId) {
+	public List<PostEntity> getPostsByUser(int page, int pageSize, int userId) {
 		return jdbc.query("SELECT " +
 						"id, " +
 						"user_id, " +
@@ -81,26 +81,27 @@ public class MariaDbPostRepository implements PostRepository {
 						"post_time, " +
 						"is_archived " +
 						"FROM posts " +
-						"WHERE user_id = ?",
-				(rs, rowNum) -> fromResultSet(rs), userId);
+						"WHERE user_id = ? " +
+						" ORDER BY p.post_time DESC " +
+						"LIMIT ? " +
+						"OFFSET ?",
+				(rs, rowNum) -> fromResultSet(rs), userId, pageSize, page * pageSize);
 	}
 
 	@Override
 	public List<PostEntity> listFitGroupsPostsOfUser(int page, int pageSize, int userId) {
-		//TODO: fix the page_id so that it remembers
-		return jdbc.query("SELECT posts.id, posts.user_id, " +
-						"posts.image_id, posts.content, " +
-						"posts.votes, posts.post_time, " +
+		//TODO: optimize to cursor pagination
+		return jdbc.query("SELECT p.id, p.user_id, p.image_id, p.content, p.votes, p.post_time, p.is_archived " +
 						"FROM posts p " +
-						"INNER JOIN user_groups ug ON ug.user_id = p.user_id " +
-						"WHERE ug.group_id IN (" +
-						"    SELECT g.id " +
-						"    FROM user_groups ug " +
-						"    INNER JOIN fitGroups g ON ug.group_id = g.id " +
-						"    WHERE ug.user_id = ?" +
-						") ORDER BY p.post_time DESC" +
+						"JOIN user_groups ug " +
+						"    ON ug.user_id = p.user_id" +
+						"JOIN group_post gp " +
+						"    ON gp.post_id = p.id " +
+						"WHERE ug.user_id = <user_id> " +
+						"AND gp.group_id = <group_id> " +
+						"AND p.is_archived = true " +
 						"LIMIT ? " +
-						"OFFSET ?;",
+						"OFFSET ?",
 				(rs, rowNum) -> fromResultSet(rs), userId, page * pageSize, pageSize);
 	}
 

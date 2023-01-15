@@ -40,16 +40,19 @@ public class PostService {
 		postRepository.changeVotes(postId, vote);
 	}
 
-	public List<Post> getPostsByUser(String authToken) {
+	public List<Post> getPostsByUser(int page, int pageSize, String authToken) {
 		int userId = authService.getUserByAuthToken(authToken).get().id;
-		return postRepository.getPostsByUser(userId)
+		return postRepository.getPostsByUser(page, pageSize, userId)
 				.stream()
 				.map(Mappers::fromPostEntity)
 				.collect(Collectors.toList());
 	}
 
-	//TODO: make the pagination
-//	public List<Post> listFitGroupsPostsOfUser(int page, int pageSize, int userId) {
-//
-//	}
+	public List<Post> listFitGroupsPostsOfUser(int page, int pageSize, String authToken) {
+		int id = userRepository.getUserByAuthToken(authToken).get().id;
+		return postRepository.listFitGroupsPostsOfUser(page, pageSize, id)
+				.stream()
+				.map(Mappers::fromPostEntity)
+				.collect(Collectors.toList());
+	}
 }

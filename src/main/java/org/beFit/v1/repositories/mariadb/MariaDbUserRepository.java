@@ -97,6 +97,20 @@ public class MariaDbUserRepository implements UserRepository {
 	}
 
 	@Override
+	public BigDecimal showUserFrozenAssetsInGroup(int id, Integer groupId) {
+		return jdbc.query("SELECT frozen_assets " +
+						"FROM user_groups " +
+						"WHERE user_id = ? " +
+						"AND group_id = ?",
+				rs -> {
+					if (rs.next()) {
+						return rs.getBigDecimal("frozen_assets");
+					}
+					return null;
+				},
+				id, groupId);
+	}
+	@Override
 	public void changeBalance(int userId, BigDecimal money) {
 		//TODO: Throw exception when balance + money < 0 or > 999999.99
 		jdbc.update(
@@ -130,9 +144,33 @@ public class MariaDbUserRepository implements UserRepository {
 	}
 
 	@Override
-	public void addUserToGroup(int userId, int groupId) {
-		jdbc.update("INSERT INTO user_groups (user_id, group_id) VALUES (?, ?)",
-				userId, groupId);
+	public void addUserToGroup(int userId, int groupId, BigDecimal frozenAssets) {
+		txTemplate.execute(status -> {
+			jdbc.update("INSERT INTO user_groups (user_id, group_id, frozen_assets) VALUES (?, ?, ?)",
+					userId, groupId, frozenAssets);
+			jdbc.update("INSERT INTO group_post (group_id, post_id) " +
+					"SELECT group_id, post_id " +
+					"FROM users_to_groups " +
+					"INNER JOIN posts ON users_to_groups.user_id = posts.user_id");
+			return null;
+		});
+	}
+
+	@Override
+	public void removeUserFrom(int userId, int groupId, BigDecimal frozenAssets) {
+		txTemplate.execute(status -> {
+			jdbc.update("DELETE FROM user_groups " +
+							"WHERE user_id = ? " +
+							"AND group_id = ?",
+					userId, groupId);
+			jdbc.update("UPDATE users " +
+					"SET balance = balance + ? " +
+					"WHERE id = ?", frozenAssets, userId);
+			jdbc.update("DELETE FROM group_post " +
+					"WHERE user_id = ? " +
+					"AND group_id = ?", userId, groupId);
+			return null;
+		});
 	}
 
 	@Override

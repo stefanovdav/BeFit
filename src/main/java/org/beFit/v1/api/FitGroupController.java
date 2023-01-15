@@ -1,6 +1,7 @@
 package org.beFit.v1.api;
 
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.beFit.v1.api.models.FitGroupInput;
 import org.beFit.v1.core.FitGroupService;
 import org.beFit.v1.core.models.FitGroup;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/groups")
+@SecurityRequirement(name = "bearerAuth")
 public class FitGroupController {
 
 	private FitGroupService fitGroupService;
@@ -20,7 +22,8 @@ public class FitGroupController {
 
 	@PostMapping
 	public FitGroup createFitGroup(@RequestBody FitGroupInput fitGroupInput) {
-		return fitGroupService.createFitGroup(fitGroupInput.name, fitGroupInput.stake);
+		return fitGroupService.createFitGroup(fitGroupInput.name, fitGroupInput.stake,
+				fitGroupInput.end, fitGroupInput.tax);
 	}
 
 	@GetMapping(value = "/{id}")
