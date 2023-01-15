@@ -17,4 +17,6 @@ public interface CommentRepository {
 	CommentEntity createSubComment(String content, int parentId, int userId);
 
 	void editContent(int commentId, String newContent);
+
+	Optional<List<CommentEntity>> showPostComments(int postId);
 }

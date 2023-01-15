@@ -13,11 +13,11 @@ public class Mappers {
 	}
 
 	public static Comment fromCommentEntity(CommentEntity c) {
-		return new Comment(c.id, c.user_id, c.content, c.commentPath);
+		return new Comment(c.id, c.post_id, c.user_id, c.content, c.commentPath);
 	}
 
 	public static FitGroup fromFitGroupEntity(FitGroupEntity fg) {
-		return new FitGroup(fg.id, fg.name, fg.stake, fg.balance);
+		return new FitGroup(fg.id, fg.name, fg.stake, fg.taxPercent, fg.startDate, fg.endDate, fg.participants);
 	}
 
 	public static Image fromImageEntity(ImageEntity i) {

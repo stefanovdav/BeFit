@@ -13,6 +13,7 @@ public interface UserRepository {
 	UserEntity getUser(int userId);
 
 	void changeBalance(int userId, BigDecimal money);
+	void changeGroupFrozenAssets(int userId, BigDecimal money, int groupId);
 
 	void changeAvatar(int userId, int image_id);
 
@@ -22,7 +23,7 @@ public interface UserRepository {
 
 	void addUserToGroup(int userId, int groupId, BigDecimal frozenAssets);
 
-	void removeUserFrom(int userId, int groupId, BigDecimal frozenAssets);
+	void removeUserFromGroup(int userId, int groupId, BigDecimal frozenAssets);
 
 	String createAuthToken(Integer userId, String authToken);
 
@@ -32,5 +33,7 @@ public interface UserRepository {
 
 	void deleteUser(int id);
 
-	BigDecimal showUserFrozenAssetsInGroup(int id, Integer groupId);
+	BigDecimal frozenAssetsInGroup(int id, Integer groupId);
+
+	List<UserEntity> usersWithoutPost(int groupId);
 }

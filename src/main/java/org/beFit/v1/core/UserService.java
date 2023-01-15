@@ -51,11 +51,16 @@ public class UserService {
 		}
 	}
 
+	public void removeUserFromGroup(Integer id, int groupId) {
+		BigDecimal frozenAssets = repository.frozenAssetsInGroup(id, groupId);
+		repository.removeUserFromGroup(id, groupId, frozenAssets);
+	}
+
 	public void deleteUser(Integer id) {
 		repository.deleteUser(id);
 	}
 
 	public BigDecimal showUserFrozenAssetsInGroup(int id, Integer groupId) {
-		return repository.showUserFrozenAssetsInGroup(id, groupId);
+		return repository.frozenAssetsInGroup(id, groupId);
 	}
 }

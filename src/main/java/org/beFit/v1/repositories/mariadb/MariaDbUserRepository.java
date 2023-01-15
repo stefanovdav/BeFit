@@ -2,6 +2,7 @@ package org.beFit.v1.repositories.mariadb;
 
 import org.beFit.v1.core.models.Role;
 import org.beFit.v1.repositories.UserRepository;
+import org.beFit.v1.repositories.entities.FitGroupEntity;
 import org.beFit.v1.repositories.entities.UserEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -10,6 +11,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -97,7 +100,7 @@ public class MariaDbUserRepository implements UserRepository {
 	}
 
 	@Override
-	public BigDecimal showUserFrozenAssetsInGroup(int id, Integer groupId) {
+	public BigDecimal frozenAssetsInGroup(int id, Integer groupId) {
 		return jdbc.query("SELECT frozen_assets " +
 						"FROM user_groups " +
 						"WHERE user_id = ? " +
@@ -110,12 +113,37 @@ public class MariaDbUserRepository implements UserRepository {
 				},
 				id, groupId);
 	}
+
+	@Override
+	public List<UserEntity> usersWithoutPost(int groupId) {
+		List<Integer> ids =  jdbc.query("SELECT user_groups.user_id " +
+						"FROM user_groups " +
+						"INNER JOIN fitGroups " +
+						"ON fitGroups.id = user_groups.group_id " +
+						"WHERE fitGroups.id = ?",
+				(rs, rowNum) -> rs.getInt("user_id"), groupId);
+
+		List<UserEntity> users = new ArrayList<>();
+		for (int id: ids) {
+			users.add(getUser(id));
+		}
+		return users;
+	}
+
 	@Override
 	public void changeBalance(int userId, BigDecimal money) {
 		//TODO: Throw exception when balance + money < 0 or > 999999.99
 		jdbc.update(
 				"UPDATE users SET balance = balance + ? WHERE id = ? " +
 						"VALUES (?, ?)", money, userId);
+	}
+
+	@Override
+	public void changeGroupFrozenAssets(int userId, BigDecimal money, int groupId) {
+		jdbc.update(
+				"UPDATE user_groups " +
+						"SET frozen_assets = ? " +
+						"WHERE user_id = ? AND group_id = ?", money, userId, groupId);
 	}
 
 	@Override
@@ -157,7 +185,7 @@ public class MariaDbUserRepository implements UserRepository {
 	}
 
 	@Override
-	public void removeUserFrom(int userId, int groupId, BigDecimal frozenAssets) {
+	public void removeUserFromGroup(int userId, int groupId, BigDecimal frozenAssets) {
 		txTemplate.execute(status -> {
 			jdbc.update("DELETE FROM user_groups " +
 							"WHERE user_id = ? " +
@@ -215,7 +243,11 @@ public class MariaDbUserRepository implements UserRepository {
 	public Optional<UserEntity> getUserByAuthToken(String authToken) {
 		return txTemplate.execute(status -> {
 			Map<String, Object> user = jdbc.queryForMap(
-					"SELECT u.id as id, u.username as username, u.password_hash as password_hash, u.image_id as image_id, u.balance as balance " +
+					"SELECT u.id as id," +
+							" u.username as username," +
+							" u.password_hash as password_hash," +
+							" u.image_id as image_id," +
+							" u.balance as balance " +
 							"FROM users u " +
 							"JOIN auth_tokens at ON u.id = at.user_id " +
 							"WHERE at.token = ?", authToken);

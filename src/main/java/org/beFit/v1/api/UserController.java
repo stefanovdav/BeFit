@@ -31,6 +31,11 @@ public class UserController {
 		return userService.getUser(id);
 	}
 
+	@GetMapping(value = "/{id}/balance")
+	public BigDecimal getUserBalance(@PathVariable("id") Integer id) {
+		return userService.getUser(id).balance;
+	}
+
 	@PatchMapping(value = "/{id}/balance")
 	public void changeBalance(@PathVariable("id") Integer id, @RequestParam("money") BigDecimal money) {
 		userService.changeBalance(id, money);
@@ -52,9 +57,14 @@ public class UserController {
 		return userService.getUserMemories(id);
 	}
 
-	@GetMapping(value = "/{id}/group/{groupId}")
+	@PostMapping(value = "/{id}/group/{groupId}")
 	public void addUserToGroup(@PathVariable("id") Integer id, @RequestParam("groupId") int groupId) {
 		userService.addUserToGroup(id, groupId);
+	}
+
+	@PatchMapping(value = "/{id}/group/{groupId}")
+	public void removeUserFromGroup(@PathVariable("id") Integer id, @RequestParam("groupId") int groupId) {
+		userService.removeUserFromGroup(id, groupId);
 	}
 
 	@DeleteMapping(value = "/{id}/delete")
@@ -63,7 +73,7 @@ public class UserController {
 		userService.deleteUser(id);
 	}
 
-	@GetMapping(value = "/{id}/{groupId}/assets}")
+	@GetMapping(value = "/{id}/{groupId}/assets")
 	public BigDecimal showUserFrozenAssetsInGroup(@PathVariable("id") Integer id,
 												  @PathVariable("groupId") Integer groupId) {
 		return userService.showUserFrozenAssetsInGroup(id, groupId);

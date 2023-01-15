@@ -28,7 +28,10 @@ public class MariaDbCommentRepository implements CommentRepository {
 	public CommentEntity createFirstComment(String content, int userId, int post_id) {
 		KeyHolder keyHolder = new GeneratedKeyHolder();
 		jdbc.update(conn -> {
-			PreparedStatement ps = conn.prepareStatement("INSERT INTO comments (user_id, content, post_id) " + "VALUES (?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement ps = conn.prepareStatement("INSERT INTO comments " +
+					"(user_id, content, post_id) " +
+					"VALUES (?, ?, ?);",
+					Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, userId);
 			ps.setString(2, content);
 			ps.setInt(3, post_id);
@@ -48,9 +51,8 @@ public class MariaDbCommentRepository implements CommentRepository {
 		jdbc.update(conn -> {
 			PreparedStatement ps = conn.prepareStatement(
 					"INSERT INTO comments (user_id," +
-							" content, " +
-							"post_id) " +
-							"VALUES (?, ?, ?);",
+					" content, " + "post_id) " +
+					"VALUES (?, ?, ?);",
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, userId);
 			ps.setString(2, content);
@@ -61,9 +63,7 @@ public class MariaDbCommentRepository implements CommentRepository {
 		Integer id = Objects.requireNonNull(keyHolder.getKey()).intValue();
 		String path = comment.commentPath + "/" + id;
 
-		jdbc.update(
-				"UPDATE comments SET comment_path = ? WHERE id = ? ",
-				path, id);
+		jdbc.update("UPDATE comments SET comment_path = ? WHERE id = ? ", path, id);
 
 		return new CommentEntity(id, post_id, userId, content, path);
 
@@ -71,13 +71,11 @@ public class MariaDbCommentRepository implements CommentRepository {
 
 	@Override
 	public CommentEntity getComment(int commentId) {
-		return jdbc.queryForObject("SELECT id, " +
-						"post_id, " +
-						"user_id, " +
-						"content, " +
-						"comment_path" +
-						"FROM comments " +
-						"WHERE id = ?",
+		return jdbc.queryForObject(
+				"SELECT id, " +
+				 "post_id, " + "user_id, " +
+				"content, " + "comment_path " +
+				"FROM comments " + "WHERE id = ?",
 				(rs, rowNum) -> fromResultSet(rs), commentId);
 	}
 
@@ -90,26 +88,32 @@ public class MariaDbCommentRepository implements CommentRepository {
 
 	@Override
 	public Optional<List<CommentEntity>> getChildren(int commentId) {
-		return Optional.of(jdbc.query("SELECT id, " +
-						"post_id " +
-						"user_id, " +
-						"content, " +
+		return Optional.of(jdbc.query(
+				"SELECT id, " + "post_id " +
+						"user_id, " + "content, " +
 						"comment_path" +
 						"FROM comments " +
 						"WHERE comment_path LIKE ?",
-				(rs, rowNum) -> fromResultSet(rs), getComment(commentId).commentPath + "/%"));
+				(rs, rowNum) -> fromResultSet(rs),
+				getComment(commentId).commentPath + "/%"));
 	}
 
 	@Override
 	public void editContent(int commentId, String newContent) {
-		jdbc.update(
-				"UPDATE comments SET content = ? WHERE id = ? ",
-				newContent, commentId);
+		jdbc.update("UPDATE comments SET content = ? WHERE id = ? ", newContent, commentId);
+	}
+
+	@Override
+	public Optional<List<CommentEntity>> showPostComments(int postId) {
+		return Optional.of(jdbc.query("SELECT c1.*, c2.* " + "FROM comments c1 " +
+				"LEFT JOIN comments c2 " + "ON c2.comment_path LIKE CONCAT(c1.comment_path, '/%') " +
+				"WHERE c1.post_id = ? " +
+				"ORDER BY c1.comment_path ASC, c2.comment_path ASC;",
+				(rs, rowNum) -> fromResultSet(rs), postId));
 	}
 
 	private CommentEntity fromResultSet(ResultSet rs) throws SQLException {
-		return new CommentEntity(
-				rs.getInt("id"),
+		return new CommentEntity(rs.getInt("id"),
 				rs.getInt("post_id"),
 				rs.getInt("user_id"),
 				rs.getString("content"),

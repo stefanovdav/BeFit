@@ -20,7 +20,7 @@ public class CoreBeans {
 	}
 
 	@Bean
-	public UserService userService(UserRepository repository) {
+	public UserService userService(UserRepository repository, FitGroupService fitGroupService) {
 		return new UserService(repository, fitGroupService);
 	}
 

@@ -9,14 +9,6 @@ import javax.sql.DataSource;
 
 @Configuration
 public class DBBeans {
-//    @Bean
-//    @ConfigurationProperties("spring.datasource")
-//    public DataSource dataSource() {
-//        return DataSourceBuilder
-//                .create()
-//                .type(SingleConnectionDataSource.class)
-//                .build();
-//    }
 
     @Bean
     public TransactionTemplate transactionTemplate(DataSource dataSource) {
