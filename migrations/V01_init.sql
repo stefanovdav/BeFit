@@ -6,8 +6,15 @@ CREATE TABLE IF NOT EXISTS images (
     url VARCHAR(255),
     public_id VARCHAR(255) DEFAULT "no id"
 );
-Select * from users;
-INSERT INTO images (title, url) VALUES ("default-avatar_ngrsnt", "https://res.cloudinary.com/dyhaxytra/image/upload/v1673618324/beFit/default-avatar_ngrsnt.png");
+
+INSERT INTO images (title, url)
+VALUES ("default-avatar_ngrsnt", "https://res.cloudinary.com/dyhaxytra/image/upload/v1673618324/beFit/default-avatar_ngrsnt.png");
+
+INSERT INTO images (title, url)
+VALUES ("cbum_vp0fcl", "https://res.cloudinary.com/dyhaxytra/image/upload/v1673454187/beFit/cbum_vp0fcl.jpg");
+
+INSERT INTO images (title, url)
+VALUES ("Arnold-Schwarzenegger", "https://res.cloudinary.com/dyhaxytra/image/upload/v1673453963/beFit/Arnold-Schwarzeneggers-Diet-and-Workout-Plan_ucwuen.jpg");
 
 CREATE TABLE IF NOT EXISTS users (
     id INT PRIMARY KEY AUTO_INCREMENT,
