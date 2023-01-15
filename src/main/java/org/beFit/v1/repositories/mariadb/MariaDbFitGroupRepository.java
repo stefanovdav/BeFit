@@ -77,6 +77,17 @@ public class MariaDbFitGroupRepository implements FitGroupRepository {
 	}
 
 	@Override
+	public void archivePosts(Integer groupId) {
+		jdbc.update("UPDATE posts " +
+				"SET is_archived = TRUE " +
+				"FROM group_post gp " +
+				"WHERE gp.group_id = ? " +
+				"AND gp.post_id = posts.id " +
+				"AND is_archived = FALSE", groupId);
+	}
+
+
+	@Override
 	public List<FitGroupEntity> listGroups() {
 		return jdbc.query("SELECT fitGroups.id," +
 						" fitGroups.group_name," +
@@ -89,6 +100,7 @@ public class MariaDbFitGroupRepository implements FitGroupRepository {
 						"FROM fitGroups",
 				(rs, rowNum) -> fromResultSet(rs));
 	}
+
 
 	private FitGroupEntity fromResultSet(ResultSet rs) throws SQLException {
 		return new FitGroupEntity(

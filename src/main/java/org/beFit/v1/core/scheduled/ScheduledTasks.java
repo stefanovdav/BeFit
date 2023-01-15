@@ -1,6 +1,5 @@
 package org.beFit.v1.core.scheduled;
 
-import org.beFit.v1.core.FitGroupService;
 import org.beFit.v1.core.Mappers;
 import org.beFit.v1.core.models.FitGroup;
 import org.beFit.v1.core.models.User;
@@ -44,30 +43,46 @@ public class ScheduledTasks {
 			if (g.stake.equals(BigDecimal.ZERO)) {
 				continue;
 			}
-
-			List<User> users = userRepository.usersWithoutPost(g.id)
+			List<User> users = userRepository.usersInGroup(g.id)
 					.stream()
 					.map(Mappers::fromUserEntity)
 					.collect(Collectors.toList());
 
+			List<User> usersThatPosted = userRepository.usersWithPost(g.id)
+					.stream()
+					.map(Mappers::fromUserEntity)
+					.collect(Collectors.toList());
+
+			List<User> usersThatDidntPost = users.stream()
+					.filter(user -> !usersThatPosted.contains(user))
+					.collect(Collectors.toList());
+
 			BigDecimal takenAssets = BigDecimal.ZERO;
 			for (int i = 0; i < users.size(); i++) {
-				Integer userId = users.get(i).id;
+				Integer userId = usersThatDidntPost.get(i).id;
 				BigDecimal assets = userRepository.frozenAssetsInGroup(userId, g.id);
 				BigDecimal fee = assets.multiply(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(g.taxPercent));
 
 				//case when the user frozen assets are >= fee
 				if (assets.compareTo(fee) >= 0) {
-					userRepository.changeGroupFrozenAssets(userId, fee.negate(), g.id);
+					userRepository.changeFrozenAssets(userId, fee.negate(), g.id);
 					takenAssets.add(fee);
 				}
 				//case when the user frozen assets are < fee
 				else {
-					userRepository.changeGroupFrozenAssets(userId, assets.negate(), g.id);
+					userRepository.changeFrozenAssets(userId, assets.negate(), g.id);
 					takenAssets.add(assets);
 					userRepository.removeUserFromGroup(userId, g.id, BigDecimal.ZERO);
 				}
+				BigDecimal payment = takenAssets.divide(BigDecimal.valueOf(usersThatPosted.size()));
+				for (User fitUser : usersThatPosted) {
+					userRepository.changeFrozenAssets(fitUser.id, payment, g.id);
+				}
 			}
+			if (g.endDate.equals(new java.sql.Date(System.currentTimeMillis()))) {
+				fitGroupRepository.deleteFitGroup(g.id);
+			}
+			fitGroupRepository.archivePosts(g.id);
 		}
 
 	}

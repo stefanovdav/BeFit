@@ -13,7 +13,7 @@ public interface UserRepository {
 	UserEntity getUser(int userId);
 
 	void changeBalance(int userId, BigDecimal money);
-	void changeGroupFrozenAssets(int userId, BigDecimal money, int groupId);
+	void changeFrozenAssets(int userId, BigDecimal money, int groupId);
 
 	void changeAvatar(int userId, int image_id);
 
@@ -35,5 +35,6 @@ public interface UserRepository {
 
 	BigDecimal frozenAssetsInGroup(int id, Integer groupId);
 
-	List<UserEntity> usersWithoutPost(int groupId);
+	List<UserEntity> usersWithPost(int groupId);
+	List<UserEntity> usersInGroup(int groupId);
 }

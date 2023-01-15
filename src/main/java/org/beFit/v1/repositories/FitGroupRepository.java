@@ -15,4 +15,6 @@ public interface FitGroupRepository {
 	void deleteFitGroup(int id);
 
 	List<FitGroupEntity> listGroups();
+
+	void archivePosts(Integer groupId);
 }

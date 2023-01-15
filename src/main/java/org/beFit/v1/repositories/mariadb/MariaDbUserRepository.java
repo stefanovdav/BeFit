@@ -115,12 +115,29 @@ public class MariaDbUserRepository implements UserRepository {
 	}
 
 	@Override
-	public List<UserEntity> usersWithoutPost(int groupId) {
-		List<Integer> ids =  jdbc.query("SELECT user_groups.user_id " +
-						"FROM user_groups " +
-						"INNER JOIN fitGroups " +
-						"ON fitGroups.id = user_groups.group_id " +
-						"WHERE fitGroups.id = ?",
+	public List<UserEntity> usersInGroup(int groupId) {
+		List<Integer> ids =  jdbc.query("SELECT u.id AS user_id" +
+						"FROM users u " +
+						"INNER JOIN user_groups ug ON u.id = ug.user_id " +
+						"WHERE ug.group_id = ?",
+				(rs, rowNum) -> rs.getInt("user_id"), groupId);
+
+		List<UserEntity> users = new ArrayList<>();
+		for (int id: ids) {
+			users.add(getUser(id));
+		}
+		return users;
+	}
+
+	@Override
+	public List<UserEntity> usersWithPost(int groupId) {
+		List<Integer> ids =  jdbc.query("SELECT u.*  " +
+						"FROM users u " +
+						"INNER JOIN user_groups ug ON u.id = ug.user_id " +
+						"INNER JOIN group_post gp ON ug.group_id = gp.group_id " +
+						"INNER JOIN posts p ON gp.post_id = p.id " +
+						"WHERE ug.group_id = ? " +
+						"AND p.is_archived = FALSE;",
 				(rs, rowNum) -> rs.getInt("user_id"), groupId);
 
 		List<UserEntity> users = new ArrayList<>();
@@ -139,7 +156,7 @@ public class MariaDbUserRepository implements UserRepository {
 	}
 
 	@Override
-	public void changeGroupFrozenAssets(int userId, BigDecimal money, int groupId) {
+	public void changeFrozenAssets(int userId, BigDecimal money, int groupId) {
 		jdbc.update(
 				"UPDATE user_groups " +
 						"SET frozen_assets = ? " +
