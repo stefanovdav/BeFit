@@ -39,4 +39,8 @@ public class FitGroupService {
 		return key.toString();
 	}
 
+	public void updateParticipantsCount(Integer groupId, int count) {
+		fitGroupRepository.updateParticipantsCount(groupId, count);
+	}
+
 }

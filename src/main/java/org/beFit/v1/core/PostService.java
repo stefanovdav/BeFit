@@ -20,7 +20,7 @@ public class PostService {
 	}
 
 	public Post createPost(String authToken, Integer imageId, String content) {
-		int userId = authService.getUserByAuthToken(authToken).get().id;
+		int userId = authService.getUserByAuthToken(authToken).id;
 		return Mappers.fromPostEntity(
 				postRepository.createPost(userId, imageId, content)
 		);
@@ -41,7 +41,7 @@ public class PostService {
 	}
 
 	public List<Post> getPostsByUser(int page, int pageSize, String authToken) {
-		int userId = authService.getUserByAuthToken(authToken).get().id;
+		int userId = authService.getUserByAuthToken(authToken).id;
 		return postRepository.getPostsByUser(page, pageSize, userId)
 				.stream()
 				.map(Mappers::fromPostEntity)
@@ -49,7 +49,7 @@ public class PostService {
 	}
 
 	public List<Post> listFitGroupsPostsOfUser(int page, int pageSize, String authToken) {
-		int id = userRepository.getUserByAuthToken(authToken).get().id;
+		int id = userRepository.getUserByAuthToken(authToken).id;
 		return postRepository.listFitGroupsPostsOfUser(page, pageSize, id)
 				.stream()
 				.map(Mappers::fromPostEntity)

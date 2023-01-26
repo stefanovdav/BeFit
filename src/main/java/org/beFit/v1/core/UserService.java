@@ -47,6 +47,7 @@ public class UserService {
 			if (balance.compareTo(stake) >= 0) {
 				changeBalance(id, stake.negate());
 				repository.addUserToGroup(id, groupId, stake);
+				fitGroupService.updateParticipantsCount(groupId, 1);
 			}
 		}
 	}
@@ -54,6 +55,7 @@ public class UserService {
 	public void removeUserFromGroup(Integer id, int groupId) {
 		BigDecimal frozenAssets = repository.frozenAssetsInGroup(id, groupId);
 		repository.removeUserFromGroup(id, groupId, frozenAssets);
+		fitGroupService.updateParticipantsCount(groupId, -1);
 	}
 
 	public void deleteUser(Integer id) {

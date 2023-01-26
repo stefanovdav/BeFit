@@ -49,7 +49,7 @@ public class CommentService {
 
 		return Mappers.fromCommentEntity(
 				commentRepository.createSubComment(content, parentId,
-						authService.getUserByAuthToken(authToken).get().id)
+						authService.getUserByAuthToken(authToken).id)
 		);
 	}
 

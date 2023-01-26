@@ -57,8 +57,6 @@ public class MariaDbUserRepository implements UserRepository {
 			Map<String, Object> user = jdbc.queryForMap(
 					"SELECT id, username, password_hash, image_id, balance " +
 							"FROM users WHERE id = ?", userId);
-			// TODO: Throw exception when creds not found, but dunno what exception
-			// is returned. Need to test this.
 
 			List<Integer> roleIDs = jdbc.query(
 					"SELECT role_id FROM users_to_roles WHERE user_id = ?",
@@ -151,8 +149,7 @@ public class MariaDbUserRepository implements UserRepository {
 	public void changeBalance(int userId, BigDecimal money) {
 		//TODO: Throw exception when balance + money < 0 or > 999999.99
 		jdbc.update(
-				"UPDATE users SET balance = balance + ? WHERE id = ? " +
-						"VALUES (?, ?)", money, userId);
+				"UPDATE users SET balance = balance + ? WHERE id = ? ", money, userId);
 	}
 
 	@Override
@@ -166,8 +163,7 @@ public class MariaDbUserRepository implements UserRepository {
 	@Override
 	public void changeAvatar(int userId, int image_id) {
 		jdbc.update(
-				"UPDATE users SET image-id = ? WHERE id = ? " +
-						"VALUES (?, ?)", image_id, userId);
+				"UPDATE users SET image_id = ? WHERE id = ? ", image_id, userId);
 	}
 
 	@Override
@@ -257,13 +253,13 @@ public class MariaDbUserRepository implements UserRepository {
 	}
 
 	@Override
-	public Optional<UserEntity> getUserByAuthToken(String authToken) {
+	public UserEntity getUserByAuthToken(String authToken) {
 		return txTemplate.execute(status -> {
 			Map<String, Object> user = jdbc.queryForMap(
-					"SELECT u.id as id," +
-							" u.username as username," +
-							" u.password_hash as password_hash," +
-							" u.image_id as image_id," +
+					"SELECT u.id as id, " +
+							" u.username as username, " +
+							" u.password_hash as password_hash, " +
+							" u.image_id as image_id, " +
 							" u.balance as balance " +
 							"FROM users u " +
 							"JOIN auth_tokens at ON u.id = at.user_id " +
@@ -275,21 +271,21 @@ public class MariaDbUserRepository implements UserRepository {
 						return rs.getInt("role_id");
 					}, user.get("id"));
 
-			List<Role> roles = roleIDs.stream().
+			List<Role> roles =
+					roleIDs.stream().
 					map((id) -> switch (id) {
 						case 1 -> Role.USER;
 						case 2 -> Role.ADMIN;
 						default -> throw new RuntimeException("invalid role id");
 					}).
 					collect(Collectors.toList());
-			return Optional.of(
-					new UserEntity(
+			return new UserEntity(
 							(int) user.get("id"),
 							(String) user.get("username"),
 							(String) user.get("password_hash"),
 							roles,
 							(int) user.get("image_id"),
-							(BigDecimal) user.get("balance")));
+							(BigDecimal) user.get("balance"));
 		});
 	}
 

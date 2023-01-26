@@ -50,7 +50,7 @@ public class CommentController {
 	//put the post_id in the local storage and when click new comment take the post_id
 	@PostMapping
 	public Comment createComment(@RequestBody CommentInput c, @RequestHeader("Authorization") String authToken) {
-		return commentService.createComment(c.content, authService.getUserByAuthToken(authToken).get().id, c.post_id);
+		return commentService.createComment(c.content, authService.getUserByAuthToken(authToken).id, c.post_id);
 	}
 
 	@PatchMapping(value = "/{id}/edit/")

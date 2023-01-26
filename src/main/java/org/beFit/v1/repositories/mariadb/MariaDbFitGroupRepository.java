@@ -36,7 +36,7 @@ public class MariaDbFitGroupRepository implements FitGroupRepository {
 			PreparedStatement ps = conn.prepareStatement(
 					"INSERT INTO fitGroups " +
 							"(group_name, stake, tax, end, group_key, start)" +
-							"VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+							"VALUES (?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, name);
 			ps.setBigDecimal(2, stake);
 			ps.setInt(3, tax);
@@ -84,6 +84,13 @@ public class MariaDbFitGroupRepository implements FitGroupRepository {
 				"WHERE gp.group_id = ? " +
 				"AND gp.post_id = posts.id " +
 				"AND is_archived = FALSE", groupId);
+	}
+
+	@Override
+	public void updateParticipantsCount(Integer groupId, int count) {
+		jdbc.update("UPDATE fitGroups " +
+				"SET participants = participants + count " +
+				"WHERE id = ?", count, groupId);
 	}
 
 

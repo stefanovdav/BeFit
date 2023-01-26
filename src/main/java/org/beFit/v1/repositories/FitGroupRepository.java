@@ -17,4 +17,6 @@ public interface FitGroupRepository {
 	List<FitGroupEntity> listGroups();
 
 	void archivePosts(Integer groupId);
+
+	void updateParticipantsCount(Integer groupId, int count);
 }

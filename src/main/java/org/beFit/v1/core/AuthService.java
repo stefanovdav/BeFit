@@ -39,11 +39,11 @@ public class AuthService {
         userRepository.createUser(username, passwordHash, roles);
     }
 
-    public Optional<User> getUserByAuthToken(String authToken) {
+    public User getUserByAuthToken(String authToken) {
         String token = authToken;
-        Optional<UserEntity> user =
+        UserEntity user =
                 userRepository.getUserByAuthToken(token);
-        return user.map(Mappers::fromUserEntity);
+        return Mappers.fromUserEntity(user);
     }
 
     private String generateAuthTokenWithoutBearer() {

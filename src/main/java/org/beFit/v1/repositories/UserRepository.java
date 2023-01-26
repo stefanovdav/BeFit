@@ -29,7 +29,7 @@ public interface UserRepository {
 
 	Optional<UserEntity> getUser(String username);
 
-	Optional<UserEntity> getUserByAuthToken(String authToken);
+	UserEntity getUserByAuthToken(String authToken);
 
 	void deleteUser(int id);
 

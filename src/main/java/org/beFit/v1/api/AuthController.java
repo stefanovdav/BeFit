@@ -24,15 +24,15 @@ public class AuthController {
     @PostMapping(value = "/login")
     public LoginDTO login(@RequestBody LoginInput input) {
         String authToken = authService.login(input.username, input.password);
-        String url = cloudinaryService.getImage(authService.getUserByAuthToken(authToken).get().imageId).getUrl();
+        String url = cloudinaryService.getImage(authService.getUserByAuthToken(authToken).imageId).getUrl();
         return new LoginDTO(authToken, input.username, url);
     }
 
     @PostMapping(value = "/register")
-    public LoginDTO register(@RequestBody LoginInput input) {
+    public void register(@RequestBody LoginInput input) {
         authService.register(input.username, input.password);
-        String authToken = authService.login(input.username, input.password);
-        String url = cloudinaryService.getImage(authService.getUserByAuthToken(authToken).get().imageId).getUrl();
-        return new LoginDTO(authToken, input.username, url);
+//        String authToken = authService.login(input.username, input.password);
+//        String url = cloudinaryService.getImage(authService.getUserByAuthToken(authToken).imageId).getUrl();
+//        return new LoginDTO(authToken, input.username, url);
     }
 }

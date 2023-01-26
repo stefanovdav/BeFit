@@ -27,18 +27,18 @@ public class SecurityValidation {
 
 	public boolean isPostOwner(String authHeader, Integer postId) {
 		String[] parts = authHeader.split(" ");
-		Optional<UserEntity> userEntity = userRepository.getUserByAuthToken(parts[1]);
+		UserEntity userEntity = userRepository.getUserByAuthToken(parts[1]);
 		PostEntity postEntity = postRepository.getById(postId);
-		return postEntity.userId == userEntity.get().id;
+		return postEntity.userId == userEntity.id;
 	}
 
 	public boolean isAccountOwner(String authHeader, Integer userId) {
-		int user_id_byAuth = userRepository.getUserByAuthToken(authHeader).get().id;
+		int user_id_byAuth = userRepository.getUserByAuthToken(authHeader).id;
 		return userId == user_id_byAuth;
 	}
 
 	public boolean isAccountAdmin(String authHeader) {
-		List<Role> roles = userRepository.getUserByAuthToken(authHeader).get().roles;
+		List<Role> roles = userRepository.getUserByAuthToken(authHeader).roles;
 		return roles.contains(Role.ADMIN);
 	}
 }
