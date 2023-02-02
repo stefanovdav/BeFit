@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.beFit.v1.core.imageservice.CloudinaryService;
 import org.beFit.v1.core.models.Image;
 import org.beFit.v1.dto.ImageUploadPayloadDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,6 +14,7 @@ public class ImageController {
 
 	CloudinaryService cloudinaryService;
 
+	@Autowired
 	public ImageController(CloudinaryService cloudinaryService) {
 		this.cloudinaryService = cloudinaryService;
 	}

@@ -8,6 +8,7 @@ import org.beFit.v1.core.AuthService;
 import org.beFit.v1.core.CommentService;
 import org.beFit.v1.core.UserService;
 import org.beFit.v1.core.models.Comment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -19,14 +20,16 @@ import java.util.Optional;
 @RequestMapping("/api/comments")
 @SecurityRequirement(name = "bearerAuth")
 public class CommentController {
-	private CommentService commentService;
-	private AuthService authService;
+	private final CommentService commentService;
+	private final AuthService authService;
 
+	@Autowired
 	public CommentController(CommentService commentService, AuthService authService) {
 		this.commentService = commentService;
 		this.authService = authService;
 	}
 
+	// TODO: commentId -> id?
 	@GetMapping(value = "/{id}")
 	public Comment getComment(@PathVariable("id") int commentId) {
 		return commentService.getComment(commentId);
@@ -47,7 +50,7 @@ public class CommentController {
 		return commentService.createSubComment(c.content, commentId, authToken);
 	}
 
-	//put the post_id in the local storage and when click new comment take the post_id
+	// put the post_id in the local storage and when click new comment take the post_id
 	@PostMapping
 	public Comment createComment(@RequestBody CommentInput c, @RequestHeader("Authorization") String authToken) {
 		return commentService.createComment(c.content, authService.getUserByAuthToken(authToken).id, c.post_id);

@@ -3,11 +3,13 @@ package org.beFit.v1.core;
 import org.beFit.v1.core.models.Comment;
 import org.beFit.v1.repositories.CommentRepository;
 import org.beFit.v1.repositories.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class CommentService {
 	private final CommentRepository commentRepository;
 	private final UserRepository userRepository;

@@ -2,11 +2,13 @@ package org.beFit.v1.core;
 
 import org.beFit.v1.core.models.FitGroup;
 import org.beFit.v1.repositories.FitGroupRepository;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Random;
 
+@Service
 public class FitGroupService {
 	private int id = 0;
 	private static final String CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

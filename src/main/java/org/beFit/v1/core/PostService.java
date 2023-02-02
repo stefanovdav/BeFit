@@ -4,10 +4,12 @@ import org.beFit.v1.core.models.Post;
 import org.beFit.v1.repositories.PostRepository;
 import org.beFit.v1.repositories.UserRepository;
 import org.springframework.data.relational.core.sql.In;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class PostService {
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;

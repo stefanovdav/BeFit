@@ -114,14 +114,14 @@ public class MariaDbUserRepository implements UserRepository {
 
 	@Override
 	public List<UserEntity> usersInGroup(int groupId) {
-		List<Integer> ids =  jdbc.query("SELECT u.id AS user_id" +
+		List<Integer> ids = jdbc.query("SELECT u.id AS user_id" +
 						"FROM users u " +
 						"INNER JOIN user_groups ug ON u.id = ug.user_id " +
 						"WHERE ug.group_id = ?",
 				(rs, rowNum) -> rs.getInt("user_id"), groupId);
 
 		List<UserEntity> users = new ArrayList<>();
-		for (int id: ids) {
+		for (int id : ids) {
 			users.add(getUser(id));
 		}
 		return users;
@@ -129,7 +129,7 @@ public class MariaDbUserRepository implements UserRepository {
 
 	@Override
 	public List<UserEntity> usersWithPost(int groupId) {
-		List<Integer> ids =  jdbc.query("SELECT u.*  " +
+		List<Integer> ids = jdbc.query("SELECT u.*  " +
 						"FROM users u " +
 						"INNER JOIN user_groups ug ON u.id = ug.user_id " +
 						"INNER JOIN group_post gp ON ug.group_id = gp.group_id " +
@@ -139,7 +139,7 @@ public class MariaDbUserRepository implements UserRepository {
 				(rs, rowNum) -> rs.getInt("user_id"), groupId);
 
 		List<UserEntity> users = new ArrayList<>();
-		for (int id: ids) {
+		for (int id : ids) {
 			users.add(getUser(id));
 		}
 		return users;
@@ -192,7 +192,7 @@ public class MariaDbUserRepository implements UserRepository {
 			jdbc.update("INSERT INTO group_post (group_id, post_id) " +
 					"SELECT group_id, post_id " +
 					"FROM users_to_groups " +
-					"INNER JOIN posts ON users_to_groups.user_id = posts.user_id");
+					"INNER JOIN posts ON user_groups.user_id = posts.user_id");
 			return null;
 		});
 	}
@@ -254,39 +254,43 @@ public class MariaDbUserRepository implements UserRepository {
 
 	@Override
 	public UserEntity getUserByAuthToken(String authToken) {
-		return txTemplate.execute(status -> {
-			Map<String, Object> user = jdbc.queryForMap(
-					"SELECT u.id as id, " +
-							" u.username as username, " +
-							" u.password_hash as password_hash, " +
-							" u.image_id as image_id, " +
-							" u.balance as balance " +
-							"FROM users u " +
-							"JOIN auth_tokens at ON u.id = at.user_id " +
-							"WHERE at.token = ?", authToken);
 
-			List<Integer> roleIDs = jdbc.query(
-					"SELECT role_id FROM users_to_roles WHERE user_id = ?",
-					(rs, rowNum) -> {
-						return rs.getInt("role_id");
-					}, user.get("id"));
+		UserEntity userEntity = txTemplate.execute(status -> {
+			{
+				Map<String, Object> user = jdbc.queryForMap(
+						"SELECT u.id as id, " +
+								" u.username as username, " +
+								" u.password_hash as password_hash, " +
+								" u.image_id as image_id, " +
+								" u.balance as balance " +
+								"FROM users u " +
+								"JOIN auth_tokens at ON u.id = at.user_id " +
+								"WHERE at.token = ?", authToken);
 
-			List<Role> roles =
-					roleIDs.stream().
-					map((id) -> switch (id) {
-						case 1 -> Role.USER;
-						case 2 -> Role.ADMIN;
-						default -> throw new RuntimeException("invalid role id");
-					}).
-					collect(Collectors.toList());
-			return new UserEntity(
-							(int) user.get("id"),
-							(String) user.get("username"),
-							(String) user.get("password_hash"),
-							roles,
-							(int) user.get("image_id"),
-							(BigDecimal) user.get("balance"));
+				List<Integer> roleIDs = jdbc.query(
+						"SELECT role_id FROM users_to_roles WHERE user_id = ?",
+						(rs, rowNum) -> {
+							return rs.getInt("role_id");
+						}, user.get("id"));
+
+				List<Role> roles =
+						roleIDs.stream().
+								map((id) -> switch (id) {
+									case 1 -> Role.USER;
+									case 2 -> Role.ADMIN;
+									default -> throw new RuntimeException("invalid role id");
+								}).
+								collect(Collectors.toList());
+				return new UserEntity(
+						(int) user.get("id"),
+						(String) user.get("username"),
+						(String) user.get("password_hash"),
+						roles,
+						(int) user.get("image_id"),
+						(BigDecimal) user.get("balance"));
+			}
 		});
+		return userEntity;
 	}
 
 	static class Queries {

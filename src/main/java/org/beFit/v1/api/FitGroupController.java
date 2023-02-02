@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.beFit.v1.api.models.FitGroupInput;
 import org.beFit.v1.core.FitGroupService;
 import org.beFit.v1.core.models.FitGroup;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @SecurityRequirement(name = "bearerAuth")
 public class FitGroupController {
 
-	private FitGroupService fitGroupService;
+	private final FitGroupService fitGroupService;
 
+	@Autowired
 	public FitGroupController(FitGroupService fitGroupService) {
 		this.fitGroupService = fitGroupService;
 	}

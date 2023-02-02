@@ -24,7 +24,6 @@ public class SecurityValidation {
 		this.authService = authService;
 	}
 
-
 	public boolean isPostOwner(String authHeader, Integer postId) {
 		String[] parts = authHeader.split(" ");
 		UserEntity userEntity = userRepository.getUserByAuthToken(parts[1]);
@@ -38,7 +37,7 @@ public class SecurityValidation {
 	}
 
 	public boolean isAccountAdmin(String authHeader) {
-		List<Role> roles = userRepository.getUserByAuthToken(authHeader).roles;
-		return roles.contains(Role.ADMIN);
+		return userRepository.getUserByAuthToken(authHeader).
+				roles.contains(Role.ADMIN);
 	}
 }

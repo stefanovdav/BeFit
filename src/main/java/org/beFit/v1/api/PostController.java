@@ -6,6 +6,7 @@ import org.beFit.v1.core.AuthService;
 import org.beFit.v1.core.PostService;
 import org.beFit.v1.core.UserService;
 import org.beFit.v1.core.models.Post;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,13 +16,14 @@ import java.util.List;
 @RequestMapping(value = "/api/posts")
 @SecurityRequirement(name = "bearerAuth")
 public class PostController {
-	private PostService postService;
+	private final PostService postService;
 
+	@Autowired
 	public PostController(PostService postService) {
 		this.postService = postService;
 	}
 
-	@GetMapping(value = "/{id}")
+	@GetMapping(value = "/{id}") //TODO: usually the IDs are Stings, why Integer? change in all files
 	public Post getPost(@PathVariable("id") Integer id) {
 		return postService.getById(id);
 	}
@@ -42,7 +44,8 @@ public class PostController {
 	}
 
 	@PostMapping
-	public Post createPost(@RequestHeader("Authorization") String authToken, @RequestBody PostInput p) {
+	public Post createPost(@RequestHeader("Authorization") String authToken,
+						   @RequestBody PostInput p) {
 		return postService.createPost(authToken, p.imageId, p.content);
 	}
 
@@ -57,6 +60,7 @@ public class PostController {
 
 	//TODO:Add pagination and only the photo
 	@GetMapping(value = "/memories/{page}/{pageSize}")
+	// TODO: why this formatting of the arguments is not used everywhere?
 	public List<Post> getUserPastPosts(@RequestHeader("Authorization") String authToken,
 									   @PathVariable("page") int page,
 									   @PathVariable("pageSize") int pageSize) {

@@ -3,10 +3,12 @@ package org.beFit.v1.core;
 import org.beFit.v1.core.models.User;
 import org.beFit.v1.repositories.UserRepository;
 import org.beFit.v1.repositories.entities.UserEntity;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Service
 public class UserService {
 	private final UserRepository repository;
 	private final FitGroupService fitGroupService;

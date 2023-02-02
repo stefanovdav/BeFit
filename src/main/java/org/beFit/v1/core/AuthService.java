@@ -6,6 +6,7 @@ import org.beFit.v1.repositories.UserRepository;
 import org.beFit.v1.repositories.entities.UserEntity;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Optional;
 
 import static java.util.Optional.ofNullable;
 
-
+@Service
 public class AuthService {
     private final UserRepository userRepository;
 
@@ -40,9 +41,8 @@ public class AuthService {
     }
 
     public User getUserByAuthToken(String authToken) {
-        String token = authToken;
         UserEntity user =
-                userRepository.getUserByAuthToken(token);
+                userRepository.getUserByAuthToken(authToken);
         return Mappers.fromUserEntity(user);
     }
 

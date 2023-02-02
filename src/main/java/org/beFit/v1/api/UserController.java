@@ -5,6 +5,7 @@ import org.beFit.v1.core.CommentService;
 import org.beFit.v1.core.PostService;
 import org.beFit.v1.core.UserService;
 import org.beFit.v1.core.models.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +17,11 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
-	private UserService userService;
-	private PostService postService;
-	private CommentService commentService;
+	private final UserService userService;
 
+	@Autowired
 	public UserController(UserService userService, PostService postService, CommentService commentService) {
 		this.userService = userService;
-		this.postService = postService;
-		this.commentService = commentService;
 	}
 
 	@GetMapping(value = "/{id}")
@@ -57,13 +55,13 @@ public class UserController {
 		return userService.getUserMemories(id);
 	}
 
-	@PostMapping(value = "/{id}/group/{groupId}")
-	public void addUserToGroup(@PathVariable("id") Integer id, @RequestParam("groupId") int groupId) {
+	@PostMapping(value = "/{id}/groups/{groupId}/join")
+	public void addUserToGroup(@PathVariable("id") Integer id, @PathVariable("groupId") int groupId) {
 		userService.addUserToGroup(id, groupId);
 	}
 
-	@PatchMapping(value = "/{id}/group/{groupId}")
-	public void removeUserFromGroup(@PathVariable("id") Integer id, @RequestParam("groupId") int groupId) {
+	@PostMapping(value = "/{id}/groups/{groupId}/leave")
+	public void removeUserFromGroup(@PathVariable("id") Integer id, @PathVariable("groupId") int groupId) {
 		userService.removeUserFromGroup(id, groupId);
 	}
 

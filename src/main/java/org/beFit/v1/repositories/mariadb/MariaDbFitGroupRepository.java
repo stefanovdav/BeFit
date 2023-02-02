@@ -112,7 +112,7 @@ public class MariaDbFitGroupRepository implements FitGroupRepository {
 	private FitGroupEntity fromResultSet(ResultSet rs) throws SQLException {
 		return new FitGroupEntity(
 				rs.getInt("id"),
-				rs.getString("name"),
+				rs.getString("group_name"),
 				rs.getBigDecimal("stake"),
 				rs.getInt("tax"),
 				rs.getDate("start"),

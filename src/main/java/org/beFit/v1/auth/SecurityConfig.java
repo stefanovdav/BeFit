@@ -98,6 +98,7 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
         return successHandler;
     }
 
+    // TODO: Only 1 javadoc comment? Seems as copied from somewhere else.
     /**
      * Disable Spring boot automatic filter registration.
      */
