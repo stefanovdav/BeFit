@@ -5,6 +5,7 @@ import org.beFit.v1.core.models.Role;
 import java.math.BigDecimal;
 import java.util.List;
 
+//TODO user record
 public class UserEntity {
 	public final Integer id;
 	public final String username;
